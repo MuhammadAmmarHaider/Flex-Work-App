@@ -67,6 +67,12 @@ function FreelancerProfile() {
   const [editedTitle, setEditedTitle] = useState(user.freelancerProfile.title);
   const [editedRate, setEditedRate] = useState(user.freelancerProfile.hourlyRate);
   const [editedBio, setEditedBio] = useState(user.freelancerProfile.bio);
+  const [newWorkHistory, setNewWorkHistory] = useState({
+    title: '', company: '', description: '', startDate: '', endDate: ''
+  });
+  const [newEducation, setNewEducation] = useState({
+    degree: '', institution: '', startDate: '', endDate: ''
+  });
 
   const handleSave = () => {
     dispatch(updateUserField({ path: 'freelancerProfile.title', value: editedTitle }));
@@ -74,7 +80,34 @@ function FreelancerProfile() {
     dispatch(updateUserField({ path: 'freelancerProfile.bio', value: editedBio }));
     setIsEditing(false);
   };
+
+  const handleAddWorkHistory = () => {
+    if (!newWorkHistory.title || !newWorkHistory.company) return;
+    const updated = [...user.freelancerProfile.workHistory, newWorkHistory];
+    dispatch(updateUserField({ path: 'freelancerProfile.workHistory', value: updated }));
+    setNewWorkHistory({ title: '', company: '', description: '', startDate: '', endDate: '' });
+  };
+
+  const handleRemoveWork = (index) => {
+    const updated = user.freelancerProfile.workHistory.filter((_, i) => i !== index);
+    dispatch(updateUserField({ path: 'freelancerProfile.workHistory', value: updated }));
+  };
+
+  const handleAddEducation = () => {
+    if (!newEducation.degree || !newEducation.institution) return;
+    const updated = [...user.freelancerProfile.education, newEducation];
+    dispatch(updateUserField({ path: 'freelancerProfile.education', value: updated }));
+    setNewEducation({ degree: '', institution: '', startDate: '', endDate: '' });
+  };
+
+  const handleRemoveEducation = (index) => {
+    const updated = user.freelancerProfile.education.filter((_, i) => i !== index);
+    dispatch(updateUserField({ path: 'freelancerProfile.education', value: updated }));
+  };
+
+
   return (
+
 
     <div className='text-4xl m-20 border-[rgb(103,103,103,1)] border-2 border-solid  rounded-3xl'>
       <div className='text-4xl flex items-center justify-between p-16'>
@@ -304,117 +337,377 @@ function FreelancerProfile() {
       <div className='p-16'>
         <h4 className='font-semibold text-5xl'>Work History</h4>
 
-        {
-          isEditing ?
-            (
-              null
-            ) :
-            (
-              <div>
-                {
-                  user.freelancerProfile.workHistory.length > 0 ?
-                    (
-                      <ul className='mt-7'>
-                        {user.freelancerProfile.workHistory.map((work, index) => {
-                          return (<li key={index} className='my-5'>
-                            <div className='font-semibold flex items-center justify-between bg-primary hover:bg-primaryHover text-white my-3 px-10 rounded-xl'>
-                              <h5 className='font-bold my-6'>{work.title}</h5>
-                              <p>{new Date(work.startDate).toLocaleDateString()} - {new Date(work.endDate).toLocaleDateString()}</p>
-                            </div>
-                            <div className='flex items-center gap-7 '>
-                              <GoOrganization className='size-12' />
-                              <p>{work.company}</p>
-                            </div>
-                            <p className='text-[#676767] my-3'>{work.description}</p>
-                          </li>)
-                        })}
-                      </ul>
-                    ) :
-                    (<p className='text-[#676767]'>No item</p>)
-                }
+        {isEditing ? (
+          <div>
+            {user.freelancerProfile.workHistory.map((work, index) => (
+              <div key={index} className="mb-10 border p-5 rounded">
+                <div className="flex justify-between">
+                  <h5 className="font-semibold text-3xl">Job #{index + 1}</h5>
+                  <button onClick={() => handleRemoveWork(index)} className="text-red-500">Remove</button>
+                </div>
+                <input
+                  type="text"
+                  value={work.title}
+                  onChange={(e) =>
+                    dispatch(updateUserField({ path: `freelancerProfile.workHistory[${index}].title`, value: e.target.value }))
+                  }
+                  className="w-full border px-4 py-3 rounded mb-4"
+                  placeholder="Job Title"
+                />
+                <input
+                  type="text"
+                  value={work.company}
+                  onChange={(e) =>
+                    dispatch(updateUserField({ path: `freelancerProfile.workHistory[${index}].company`, value: e.target.value }))
+                  }
+                  className="w-full border px-4 py-3 rounded mb-4"
+                  placeholder="Company"
+                />
+                <textarea
+                  value={work.description}
+                  onChange={(e) =>
+                    dispatch(updateUserField({ path: `freelancerProfile.workHistory[${index}].description`, value: e.target.value }))
+                  }
+                  className="w-full border px-4 py-3 rounded mb-4"
+                  placeholder="Job Description"
+                />
+                <div className="flex gap-4">
+                  <input
+                    type="date"
+                    value={new Date(work.startDate?.$date || work.startDate).toISOString().split("T")[0]}
+                    onChange={(e) =>
+                      dispatch(updateUserField({ path: `freelancerProfile.workHistory[${index}].startDate`, value: e.target.value }))
+                    }
+                    className="border px-4 py-3 rounded"
+                  />
+                  <input
+                    type="date"
+                    value={new Date(work.endDate?.$date || work.endDate).toISOString().split("T")[0]}
+                    onChange={(e) =>
+                      dispatch(updateUserField({ path: `freelancerProfile.workHistory[${index}].endDate`, value: e.target.value }))
+                    }
+                    className="border px-4 py-3 rounded"
+                  />
+                </div>
               </div>
-            )
-        }
+            ))}
+
+            <div className="mt-12 border-t pt-8">
+              <h5 className='text-3xl font-semibold mb-4'>Add New Experience</h5>
+              <input
+                type="text"
+                placeholder="Job Title"
+                value={newWorkHistory.title}
+                onChange={(e) => setNewWorkHistory({ ...newWorkHistory, title: e.target.value })}
+                className="w-full border px-4 py-3 rounded mb-4"
+              />
+              <input
+                type="text"
+                placeholder="Company"
+                value={newWorkHistory.company}
+                onChange={(e) => setNewWorkHistory({ ...newWorkHistory, company: e.target.value })}
+                className="w-full border px-4 py-3 rounded mb-4"
+              />
+              <textarea
+                placeholder="Description"
+                value={newWorkHistory.description}
+                onChange={(e) => setNewWorkHistory({ ...newWorkHistory, description: e.target.value })}
+                className="w-full border px-4 py-3 rounded mb-4"
+              />
+              <div className="flex gap-4 mb-4">
+                <input
+                  type="date"
+                  value={newWorkHistory.startDate}
+                  onChange={(e) => setNewWorkHistory({ ...newWorkHistory, startDate: e.target.value })}
+                  className="border px-4 py-3 rounded"
+                />
+                <input
+                  type="date"
+                  value={newWorkHistory.endDate}
+                  onChange={(e) => setNewWorkHistory({ ...newWorkHistory, endDate: e.target.value })}
+                  className="border px-4 py-3 rounded"
+                />
+              </div>
+              <button onClick={handleAddWorkHistory} className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700">
+                Add Work Experience
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            {user.freelancerProfile.workHistory.length > 0 ? (
+              <ul className='mt-7'>
+                {user.freelancerProfile.workHistory.map((work, index) => (
+                  <li key={index} className='my-5'>
+                    <div className='font-semibold flex items-center justify-between bg-primary hover:bg-primaryHover text-white my-3 px-10 rounded-xl'>
+                      <h5 className='font-bold my-6'>{work.title}</h5>
+                      <p>{new Date(work.startDate?.$date || work.startDate).toLocaleDateString()} - {new Date(work.endDate?.$date || work.endDate).toLocaleDateString()}</p>
+                    </div>
+                    <div className='flex items-center gap-7'>
+                      <GoOrganization className='size-12' />
+                      <p>{work.company}</p>
+                    </div>
+                    <p className='text-[#676767] my-3'>{work.description}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className='text-[#676767]'>No item</p>
+            )}
+          </div>
+        )}
       </div>
       <hr />
-      {
-        isEditing ?
-          (null) :
-          (
-            <div className='p-16'>
-              <h4 className='font-semibold text-5xl'>Skills</h4>
-              <div className='my-6'>
-                <ul className="flex gap-4 items-center overflow-x-auto scroll-smooth no-scrollbar mt-7">
-                  {user.freelancerProfile.skills.map((skill) => (
-                    <li key={skill} className="bg-[#d9d9d9] px-6 py-3 rounded-full whitespace-nowrap shrink-0">
-                      {skill}
-                    </li>
-                  ))}
-                </ul>
+      {isEditing ? (
+        <div className="mt-7">
+          <h4 className="m-8 ml-14 font-semibold text-5xl">Skills</h4>
+          <div className="flex flex-wrap gap-4 mt-4">
+            {user.freelancerProfile.skills.map((skill, index) => (
+              <div key={index} className="m-8 ml-14 flex items-center gap-2">
+                <input
+                  type="text"
+                  value={skill}
+                  onChange={(e) =>
+                    dispatch(updateUserField({
+                      path: `freelancerProfile.skills[${index}]`,
+                      value: e.target.value
+                    }))
+                  }
+                  className="border px-4 py-2 rounded"
+                  placeholder="Skill"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newSkills = [...user.freelancerProfile.skills];
+                    newSkills.splice(index, 1);
+                    dispatch(updateUserField({
+                      path: 'freelancerProfile.skills',
+                      value: newSkills
+                    }));
+                  }}
+                  className="text-red-500 text-xl font-bold hover:text-red-700"
+                  title="Remove skill"
+                >
+                  −
+                </button>
               </div>
-            </div>
-          )
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const newSkills = [...user.freelancerProfile.skills, ""];
+              dispatch(updateUserField({
+                path: 'freelancerProfile.skills',
+                value: newSkills
+              }));
+            }}
+            className="m-8 ml-14 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            + Add Skill
+          </button>
+        </div>
+      ) : (
+        <div className='p-16'>
+          <h4 className='font-semibold text-5xl'>Skills</h4>
+          <div className='my-6'>
+            <ul className="flex gap-4 items-center overflow-x-auto scroll-smooth no-scrollbar mt-7">
+              {user.freelancerProfile.skills.map((skill) => (
+                <li key={skill} className="bg-[#d9d9d9] px-6 py-3 rounded-full whitespace-nowrap shrink-0">
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
       }
+
       <hr />
       <div className='p-16'>
         <h4 className='font-semibold text-5xl'>Education</h4>
-        {
-          isEditing ?
-            (null) :
-            (
-              <div>
-                {
-                  user.freelancerProfile.education.length > 0 ?
-                    (
-                      <ul className='mt-7'>
-                        {user.freelancerProfile.education.map((school, index) => {
-                          return (<li key={index} className='my-5'>
-                            <div className='font-semibold flex items-center justify-between bg-primary hover:bg-primaryHover text-white my-3 px-10 rounded-xl'>
-                              <h5 className='font-bold my-6'>{school.degree}</h5>
-                              <p>{new Date(school.startDate).toLocaleDateString()} - {new Date(school.endDate).toLocaleDateString()}</p>
-                            </div>
-                            <div className='flex items-center gap-7 '>
-                              <GoOrganization className='size-12' />
-                              <p>{school.institution}</p>
-                            </div>
-                          </li>)
-                        })}
-                      </ul>
-                    ) :
-                    (<p className='text-[#676767]'>No item</p>)
-                }
+        {isEditing ? (
+          <div>
+            {user.freelancerProfile.education.map((edu, index) => (
+              <div key={index} className="mb-10 border p-5 rounded">
+                <div className="flex justify-between">
+                  <h5 className="font-semibold text-3xl">Education #{index + 1}</h5>
+                  <button onClick={() => handleRemoveEducation(index)} className="text-red-500">Remove</button>
+                </div>
+                <input
+                  type="text"
+                  value={edu.degree}
+                  onChange={(e) => dispatch(updateUserField({ path: `freelancerProfile.education[${index}].degree`, value: e.target.value }))}
+                  className="w-full border px-4 py-3 rounded mb-4"
+                  placeholder="Degree"
+                />
+                <input
+                  type="text"
+                  value={edu.institution}
+                  onChange={(e) => dispatch(updateUserField({ path: `freelancerProfile.education[${index}].institution`, value: e.target.value }))}
+                  className="w-full border px-4 py-3 rounded mb-4"
+                  placeholder="Institution"
+                />
+                <div className="flex gap-4">
+                  <input
+                    type="date"
+                    value={edu.startDate ? new Date(edu.startDate?.$date || edu.startDate).toISOString().split("T")[0] : ""}
+                    onChange={(e) => dispatch(updateUserField({ path: `freelancerProfile.education[${index}].startDate`, value: e.target.value }))}
+                    className="border px-4 py-3 rounded"
+                  />
+                  <input
+                    type="date"
+                    value={edu.endDate ? new Date(edu.endDate?.$date || edu.endDate).toISOString().split("T")[0] : ""}
+                    onChange={(e) => dispatch(updateUserField({ path: `freelancerProfile.education[${index}].endDate`, value: e.target.value }))}
+                    className="border px-4 py-3 rounded"
+                  />
+                </div>
               </div>
-            )
-        }
+            ))}
+
+            <div className="mt-12 border-t pt-8">
+              <h5 className='text-3xl font-semibold mb-4'>Add New Education</h5>
+              <input
+                type="text"
+                placeholder="Degree"
+                value={newEducation.degree}
+                onChange={(e) => setNewEducation({ ...newEducation, degree: e.target.value })}
+                className="w-full border px-4 py-3 rounded mb-4"
+              />
+              <input
+                type="text"
+                placeholder="Institution"
+                value={newEducation.institution}
+                onChange={(e) => setNewEducation({ ...newEducation, institution: e.target.value })}
+                className="w-full border px-4 py-3 rounded mb-4"
+              />
+              <div className="flex gap-4 mb-4">
+                <input
+                  type="date"
+                  value={newEducation.startDate}
+                  onChange={(e) => setNewEducation({ ...newEducation, startDate: e.target.value })}
+                  className="border px-4 py-3 rounded"
+                />
+                <input
+                  type="date"
+                  value={newEducation.endDate}
+                  onChange={(e) => setNewEducation({ ...newEducation, endDate: e.target.value })}
+                  className="border px-4 py-3 rounded"
+                />
+              </div>
+              <button onClick={handleAddEducation} className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700">
+                Add Education
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            {user.freelancerProfile.education.length > 0 ? (
+              <ul className='mt-7'>
+                {user.freelancerProfile.education.map((school, index) => (
+                  <li key={index} className='my-5'>
+                    <div className='font-semibold flex items-center justify-between bg-primary hover:bg-primaryHover text-white my-3 px-10 rounded-xl'>
+                      <h5 className='font-bold my-6'>{school.degree}</h5>
+                      <p>{new Date(school.startDate?.$date || school.startDate).toLocaleDateString()} - {new Date(school.endDate?.$date || school.endDate).toLocaleDateString()}</p>
+                    </div>
+                    <div className='flex items-center gap-7 '>
+                      <GoOrganization className='size-12' />
+                      <p>{school.institution}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className='text-[#676767]'>No item</p>
+            )}
+          </div>
+        )}
+
       </div>
       <hr />
       <div className='p-16'>
         <h4 className='font-semibold text-5xl'>Languages</h4>
-        {
-          isEditing ?
-            (null) :
-            (
-              <div>
-                {
-                  user.freelancerProfile.languages.length > 0 ?
-                    (
-                      <ul className='mt-7'>
-                        {user.freelancerProfile.languages.map((language, index) => {
-                          return (<li key={index} className='my-2'>
-                            <div className='font-semibold flex items-center justify-between'>
-                              <h5 className='font-bold my-4'>{language.name}</h5>
-                              <p>{language.proficiency}</p>
-                            </div>
-                          </li>)
-                        })}
-                      </ul>
-                    ) :
-                    (<p className='text-[#676767]'>No item</p>)
-                }
+        {isEditing ? (
+          <div className="flex flex-col gap-4 mt-7">
+            {user.freelancerProfile.languages.map((lang, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={lang.name}
+                  onChange={(e) =>
+                    dispatch(updateUserField({
+                      path: `freelancerProfile.languages[${index}].name`,
+                      value: e.target.value
+                    }))
+                  }
+                  className="border px-4 py-2 rounded"
+                  placeholder="Language"
+                />
+                <b>:</b>
+                <input
+                  type="text"
+                  value={lang.proficiency}
+                  onChange={(e) =>
+                    dispatch(updateUserField({
+                      path: `freelancerProfile.languages[${index}].proficiency`,
+                      value: e.target.value
+                    }))
+                  }
+                  className="border px-4 py-2 rounded"
+                  placeholder="Proficiency"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = [...user.freelancerProfile.languages];
+                    updated.splice(index, 1);
+                    dispatch(updateUserField({
+                      path: 'freelancerProfile.languages',
+                      value: updated
+                    }));
+                  }}
+                  className="text-red-500 text-xl font-bold hover:text-red-700"
+                  title="Remove language"
+                >
+                  −
+                </button>
               </div>
-            )
-        }
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                const updated = [...user.freelancerProfile.languages, { name: "", proficiency: "" }];
+                dispatch(updateUserField({
+                  path: 'freelancerProfile.languages',
+                  value: updated
+                }));
+              }}
+              className="mt-2 w-fit bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              + Add Language
+            </button>
+          </div>
+        ) : (
+          <div>
+            {user.freelancerProfile.languages.length > 0 ? (
+              <ul className='mt-7'>
+                {user.freelancerProfile.languages.map((language, index) => (
+                  <li key={index} className='my-2'>
+                    <div className='font-semibold flex items-center justify-between'>
+                      <h5 className='font-bold my-4'>{language.name}</h5>
+                      <p>{language.proficiency}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className='text-[#676767]'>No item</p>
+            )}
+          </div>
+        )}
       </div>
+
       <hr />
       <div className='p-16'>
         <h4 className='font-semibold text-5xl'>Your project catalog</h4>
