@@ -54,6 +54,7 @@ const userSchema = new mongoose.Schema({
     companyWebsite: String,
     description: String
   },
+  savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
   createdAt: { type: Date, default: Date.now }
 });
 

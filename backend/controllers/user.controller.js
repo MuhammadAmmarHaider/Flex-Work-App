@@ -1,5 +1,5 @@
 const User = require('../models/user.model');
-
+const bcrypt = require('bcrypt');
 
 const getUsers = async (req, res) => {
   try {
@@ -24,8 +24,9 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const user = new User(req.body);
-    const saved = await user.save();
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const newUser = new User({ ...req.body, password: hashedPassword });
+    const saved = await newUser.save();
     res.status(201).json(saved);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -61,10 +62,22 @@ const patchUser = async (req, res) => {
   }
 };
 
+const getSavedJobs = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).populate('savedJobs');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json(user.savedJobs);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
   updateUser,
   patchUser,
+  getSavedJobs,
 };

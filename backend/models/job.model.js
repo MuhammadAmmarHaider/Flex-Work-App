@@ -8,7 +8,7 @@ const jobSchema = new mongoose.Schema({
   roleType: String,
   budget: {
     amount: Number,
-    paymentType: { type: String, enum: ['Hourly', 'Fixed'] },
+    paymentType: { type: String, enum: ['Hourly', 'Fixed Price'] },
     experienceLevel: { type: String, enum: ['Beginner', 'Intermediate', 'Senior'] }
   },
   estimatedDuration: { type: String, enum: ['More than 6 months', '3 to 6 months', '1 to 3 months', 'Less than 1 month'] },

@@ -6,7 +6,7 @@ const proposalSchema = new mongoose.Schema({
   coverLetter: String,
   bid: {
     amount: Number,
-    type: { type: String, enum: ['Hourly', 'Fixed'] }
+    type: { type: String, enum: ['Hourly', 'Fixed Price'] }
   },
   submittedAt: { type: Date, default: Date.now },
   status: { type: String, enum: ['pending', 'accepted', 'rejected', 'withdrawn'], default: 'pending' },

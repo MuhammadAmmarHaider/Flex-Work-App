@@ -1,4 +1,6 @@
 const express = require('express');
+const auth = require("../middleware/auth");
+
 const router = express.Router();
 const {
   getProposals,
@@ -6,12 +8,14 @@ const {
   createProposal,
   updateProposal,
   patchProposal,
+  getProposalsByClientId
 } = require('../controllers/proposal.controller');
 
-router.get('/', getProposals);           
-router.get('/:id', getProposalById);     
-router.post('/', createProposal);        
-router.put('/:id', updateProposal);     
-router.patch('/:id', patchProposal);
+router.get('/',auth, getProposals);           
+router.get('/:id',auth, getProposalById);     
+router.post('/',auth, createProposal);        
+router.put('/:id',auth, updateProposal);     
+router.patch('/:id',auth, patchProposal);
+router.get('/client/:clientId',auth, getProposalsByClientId);
 
 module.exports = router;

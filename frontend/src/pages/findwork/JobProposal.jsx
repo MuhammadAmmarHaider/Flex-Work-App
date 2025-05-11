@@ -8,16 +8,60 @@ import posts from '../../DummyData';
 function JobProposal() {
   const {id} = useParams();
   const navigate = useNavigate();
+  const [amount, setAmount] = useState(0.0);
+  const [duration, setDuration] = useState('');
+  const [coverletter,setCoverletter] = useState("");
 
-  const job = posts.find((post) => post.id === id);
+     const applicantId = localStorage.getItem('userId');
+  
+    useEffect(() => {
+    async function fetchJob() {
+      try {
+        const response = await axios.get('/jobs');
+        const allJobs = response.data;
+        const foundJob = allJobs.find((j) => j._id === id || j.id === id);
+        setJob(foundJob);
+      } catch (err) {
+        console.error('Error fetching job:', err);
+      }
+    }
 
-  function handleSubmitProposal(e)
-  {
+    fetchJob();
+  }, [id]);
+
+  async function handleSubmitProposal(e) {
     e.preventDefault();
 
+    if (!job || !amount || !duration || !coverletter) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    try {
+      const proposalData = {
+        jobId: job._id || job.id,
+        applicantId: applicantId,
+        coverLetter: coverletter,
+        bid: {
+          amount: parseFloat(amount),
+          type: job.budget.paymentType
+        },
+        duration: duration
+      };
+
+      const response = await axios.post('/api/proposals', proposalData);
+
+      if (response.status === 201) {
+        alert('Proposal submitted successfully!');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Error submitting proposal:', error);
+      alert('Failed to submit proposal.');
+    }
   }
-  function handleClickCancel(e)
-  {
+
+  function handleClickCancel(e) {
     e.preventDefault();
     navigate('');
   }
@@ -27,8 +71,8 @@ function JobProposal() {
       <div className='mx-20'>
         <h1 className='text-7xl font-semibold my-16'>Submit a proposal</h1>
         <JobDetails job={job} />
-        <TermsCard />
-        <AdditionalDetails />
+        <TermsCard amount={amount} setAmount={setAmount} duration={duration} setDuration={setDuration}/>
+        <AdditionalDetails coverletter={coverletter} setCoverletter={setCoverletter}/>
         <div className='flex items-center gap-10 text-4xl my-10'>
           <button onClick={handleSubmitProposal} className='bg-primary hover:bg-primaryHover text-white p-6 rounded-lg'>
             Submit proposal
