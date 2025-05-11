@@ -3,7 +3,7 @@ const dummyUser = [
         _id: "ObjectId",
         email: "abc@gmail.com",
         password: "123",
-        role: "client",
+        role: "admin",
         name: "John Doe",
         location: "Lahore",
         balance: "0",

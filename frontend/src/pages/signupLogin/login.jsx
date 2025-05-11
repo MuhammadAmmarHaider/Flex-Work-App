@@ -36,11 +36,11 @@ const Login = () => {
                 if (response) { //use response token instead
                     console.log(response);
                     dispatch(updateUser(response))
-                    if (response.role === "client") {
-                        navigate('/client/dashboard');
+                    if (response.role === "admin") {
+                        navigate('/admin/dashboard');
                     }
-                    else if (response.role === "freelancer") {
-                        navigate('/'); /// needed to be set yet
+                    else if (response.role === "freelancer" || response.role === "client") {
+                        navigate('/');
                     }
                     else {
                         setError("Invalid user Details by server.");
