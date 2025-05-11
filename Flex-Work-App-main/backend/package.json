@@ -1,3 +1,4 @@
+<<<<<<< HEAD:Flex-Work-App-main/backend/package.json
 {
   "name": "backend",
   "version": "1.0.0",
@@ -21,3 +22,30 @@
     "nodemon": "^3.1.10"
   }
 }
+=======
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
+>>>>>>> cbd0a131a4dcf32a52c69902999e0a4fc7ade991:backend/package.json
