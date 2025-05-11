@@ -21,12 +21,17 @@ import Profile from "../pages/profile/Profile";
 import Whatsnew from "../pages/What's new/whatsnew";
 import Research from "../pages/What's new/research";
 import Blog from "../pages/What's new/Blog";
+import Update from "../pages/What's new/Update";
 const router = createBrowserRouter([
     {
         path: '/',
         element: <App />,
         children: [
             //add other routes here
+            {
+                path: '/update',
+                element: <Update/>
+            },
             {
                 path: '/blog',
                 element: <Blog/>

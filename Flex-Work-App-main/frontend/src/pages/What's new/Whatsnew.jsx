@@ -6,15 +6,11 @@ export default function Whatsnew() {
       <div className="flex space-x-8">
         {/* Upwork Update */}
         <div className="text-center">
-          <Link Link to="/upwork-update" className="text-xl font-semibold text-blue-500 hover:text-blue-700">Upwork Update</Link>
+          <Link Link to="/update" className="text-xl font-semibold text-blue-500 hover:text-blue-700">Upwork Update</Link>
           <p className="text-gray-500 mt-2">Check out our latest products, partners, and enhancements.</p>
         </div>
 
-        {/* Release Notes */}
-        <div className="text-center">
-          <Link to ="/release-notes" className="text-xl font-semibold text-blue-500 hover:text-blue-700">Release Notes</Link>
-          <p className="text-gray-500 mt-2">Our latest product news, additions, and improvements.</p>
-        </div>
+        
 
         {/* Blog */}
         <div className="text-center">
