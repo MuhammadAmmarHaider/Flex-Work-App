@@ -28,4 +28,52 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/signup', async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    country,
+    subscribe,
+    role
+  } = req.body;
+
+  if (!email || !password || !firstName || !lastName || !role) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(409).json({ message: 'Email already in use' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      email,
+      password: hashedPassword,
+      role,
+      name: `${firstName} ${lastName}`,
+      location: country,
+      createdAt: new Date()
+    });
+
+    await user.save();
+
+    res.status(201).json({
+      message: 'Signup successful',
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        name: user.name
+      }
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 module.exports = router;

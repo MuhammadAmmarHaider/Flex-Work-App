@@ -10,7 +10,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState =     {
         email: "abc@gmail.com",
         password: "123",
-        role: "freelancer",
+        role: "client",
         name: "John Doe",
         location: "Lahore",
         balance: "0",

@@ -1,9 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import dummyUser from '../../dummyUser';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../../redux/userSlice';
-
+import axios from 'axios';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -13,8 +12,7 @@ const Login = () => {
     const [error, setError] = useState(null);
     const dispatch = useDispatch();
 
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const email = emailRef.current.value;
         const password = passwordRef.current.value;
@@ -27,44 +25,42 @@ const Login = () => {
         try {
             setLoading(true);
             setError(null);
+            const response = await axios.post('http://localhost:5000/login', {
+                email,
+                password
+            });
 
-            let response = null;
-            //here use axios for the login api
-            setTimeout(() => { //mimic loading
-                // response = await axios.post('/api/login', { email, password });
-                response = dummyUser.find(user => user.email === email && user.password === password);
-                if (response) { //use response token instead
-                    console.log(response);
-                    dispatch(updateUser(response))
-                    if (response.role === "admin") {
-                        navigate('/admin/dashboard');
-                    }
-                    else if (response.role === "freelancer" || response.role === "client") {
-                        navigate('/');
-                    }
-                    else {
-                        setError("Invalid user Details by server.");
-                    }
-                }
-                else {
-                    setError("Invalid email or password.");
-                }
-                setLoading(false);
-                passwordRef.current.value = "";
-                emailRef.current.value = "";
-            }, "3000");
+            const { token, user } = response.data;
+            localStorage.setItem("token", token);
 
-        } catch (e) {
-            setError(e.message)
+            dispatch(updateUser(user));
+
+            if (user.role === "admin") {
+                navigate('/admin/dashboard');
+            } else if (user.role === "freelancer" || user.role === "client") {
+                navigate('/');
+            } else {
+                setError("Unknown user role.");
+            }
+
+            emailRef.current.value = "";
+            passwordRef.current.value = "";
+
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                setError(err.response.data.message);
+            } else {
+                setError("Something went wrong.");
+            }
+        } finally {
+            setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="text-3xl min-h-screen flex items-center justify-center bg-gray-100">
             <form
                 onSubmit={handleSubmit}
-                action="#"
-                method="post"
                 className="flex flex-col items-center gap-10 py-24 px-52 bg-white rounded-3xl shadow-xl w-full max-w-screen-lg"
             >
                 <h2 className="text-5xl font-bold text-gray-700 mb-4">Login to FlexWork</h2>
@@ -73,32 +69,35 @@ const Login = () => {
                     type="text"
                     placeholder="Username or Email"
                     ref={emailRef}
-                    className="border border-black p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent hover:ring-2 hover:ring-black hover:border-transparent"
+                    className="border border-black p-3 rounded-xl w-full"
                 />
 
                 <input
                     type="password"
                     placeholder="Enter Password"
                     ref={passwordRef}
-                    className="border border-black p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent hover:ring-2 hover:ring-black hover:border-transparent"
+                    className="border border-black p-3 rounded-xl w-full"
                 />
 
-                <p className='text-error'>{error ? error : ''}</p>
+                {error && <p className='text-red-500'>{error}</p>}
+
                 <button
                     disabled={loading}
                     type="submit"
                     className=" bg-primary text-white p-5 rounded-xl w-full mt-4 hover:bg-primaryHover focus:outline-none disabled:bg-gray-400"
                 >
-                    Login
+                    {loading ? "Logging in..." : "Login"}
                 </button>
 
                 <p className="text-md text-gray-600">or</p>
+
                 <button
                     disabled={loading}
                     className="w-full mt-2 p-5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 focus:outline-none disabled:bg-gray-400"
                 >
                     Continue with Google
                 </button>
+
                 <button
                     disabled={loading}
                     className="font-semibold w-full mt-2 p-5 border border-black rounded-xl hover:ring-2 hover:ring-black hover:border-transparent disabled:bg-gray-400"
@@ -112,7 +111,7 @@ const Login = () => {
                         disabled={loading}
                         onClick={(e) => {
                             e.preventDefault();
-                            navigate('/signup')
+                            navigate('/signup');
                         }}
                         className="text-primary font-medium hover:underline focus:outline-none disabled:bg-gray-400"
                     >
@@ -122,6 +121,6 @@ const Login = () => {
             </form>
         </div>
     );
-}
+};
 
 export default Login;

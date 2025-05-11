@@ -11,7 +11,6 @@ import SavedJobs from "../pages/findwork/SavedJobs";
 import FreelancerProposals from "../pages/proposals/FreelancerProposals";
 import ProposalDetails from "../components/ProposalDetails";
 import AllJobPosts from "../pages/findtalent/AllJobPosts";
-import ClientLanding from "../pages/landing/ClientLanding";
 import LandingRouter from "../pages/landing/LandingRouter";
 import ClientProposals from "../pages/proposals/ClientProposals";
 import Profile from "../pages/profile/Profile";
@@ -19,6 +18,8 @@ import SignupForm from '../pages/signupLogin/SignupForm';
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import AdminRoute from './AdminRoute';
 import Messages from "../pages/messages/Messages";
+import PrivateRoute from "./PrivateRoute";
+
 
 const router = createBrowserRouter([
     {
@@ -63,15 +64,15 @@ const router = createBrowserRouter([
             },
             {
                 path: '/saved-jobs',
-                element: <SavedJobs />
+                element: <PrivateRoute element={<SavedJobs />} />
             },
             {
                 path: '/freelancer-proposals',
-                element: <FreelancerProposals />
+                element: <PrivateRoute element={<FreelancerProposals />} />
             },
             {
                 path: '/proposal-details/:id',
-                element: <ProposalDetails />
+                element: <PrivateRoute element={<ProposalDetails />} />
             },
             {
                 path: '/all-jobs',
@@ -79,15 +80,15 @@ const router = createBrowserRouter([
             },
             {
                 path: '/client-proposals',
-                element: <ClientProposals />
+                element: <PrivateRoute element={<ClientProposals />} />
             },
             {
                 path: '/profile',
-                element: <Profile />
+                element: <PrivateRoute element={<Profile />} />
             },
             {
                 path: '/messages',
-                element: <Messages />
+                element: <PrivateRoute element={<Messages />} />
             },
             {
                 path: '/admin/dashboard',
@@ -104,7 +105,10 @@ const router = createBrowserRouter([
             {
                 path: '/admin/jobs',
                 element: <AdminRoute element={<AdminDashboard section="jobs" />} />
-            }
+            },
+
+
+
         ]
     }
 ]);
