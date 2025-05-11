@@ -1,14 +1,38 @@
 const Job = require('../models/job.model');
 
 // we can populate it so that make it equavilient to our dummy data which includes some of the clients info in job.
+// const getJobs = async (req, res) => {
+//     try {
+//         const jobs = await Job.find();
+//         res.status(200).json(jobs);
+//     } catch (error) {
+//         res.status(500).json({message:error.message})
+//     }
+// };
 const getJobs = async (req, res) => {
-    try {
-        const jobs = await Job.find();
-        res.status(200).json(jobs);
-    } catch (error) {
-        res.status(500).json({message:error.message})
-    }
+  try {
+    const jobs = await Job.find().populate('clientId'); // populates user data
+
+    const enrichedJobs = jobs.map(job => {
+      const client = job.clientId;
+
+      return {
+        ...job._doc, // spreads job fields
+        client: {
+          clientRating: client?.rating?.value || null,
+          clientSpent: client?.clientProfile?.spent || null,
+          clientLocation: client?.location || null,
+          paymentVerified: !!client?.billingInfo?.cardNumber
+        }
+      };
+    });
+
+    res.status(200).json(enrichedJobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
+
 
 const getJobById = async (req, res) => {
     try{
@@ -65,7 +89,6 @@ const patchJob = async (req, res) => {
 const getJobsByClientId = async (req, res) => {
     try {
         const { clientId } = req.params;
-
         const jobs = await Job.find({ clientId });
         res.status(200).json(jobs);
     } catch (error) {

@@ -16,7 +16,8 @@ function JobPost() {
     const [title,setTitle] = useState("");
     const [roleType,setRoleType]  = useState("");
     const [hoursPerWeek,setHoursPerWeek] = useState("");
-    const [locatoin,setLocation] = useState("");
+    const [location,setLocation] = useState("");
+    const [description,setDescription] = useState("");
 
     const exampleTitles = [
         'Build responsive WordPress site with booking/payment functionality',

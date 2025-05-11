@@ -10,7 +10,7 @@ function AllJobPosts() {
 
   useEffect(() => {
     const clientId = localStorage.getItem('userId');
-
+    
     if (!clientId) {
       setError('User not logged in.');
       setLoading(false);

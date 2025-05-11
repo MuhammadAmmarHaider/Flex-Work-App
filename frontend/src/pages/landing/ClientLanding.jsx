@@ -1,19 +1,19 @@
 import React from 'react'
 import { IoAdd } from "react-icons/io5";
 import AllJobPosts from '../findtalent/AllJobPosts';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 
 function ClientLanding() {
     
-    const user ={
-        name:"Ammar",
-        role:"Client"
-    }
+    const user = useSelector(state=>state.user);
+    const navigate = useNavigate()
 
     function handlePostJob(e)
     {
         e.preventDefault();
-
+        navigate("/post-job");
     }
 
   return (
