@@ -13,7 +13,7 @@ function Navbar() {
 
   return (
     <nav className="bg-white shadow-md py-8 px-10">
-      {user.role !== null ? (
+      {user.role !== "" ? (
         user.role === 'client' ? (<div className="flex justify-between items-center">
           <div className="flex items-center space-x-11">
             <ul className="flex space-x-9 items-center">
@@ -21,7 +21,7 @@ function Navbar() {
               <li className="text-3xl hover:text-primaryHover"><Link to='/post-job'>Post Job</Link></li>
               <li className="text-3xl hover:text-primaryHover"><Link to='/client-proposals'>Proposals</Link></li>
               <li className="text-3xl hover:text-primaryHover"><Link to='/all-jobs'>All Jobs</Link></li>
-              <li className="text-3xl hover:text-primaryHover"><Link to=''>Messages</Link></li>
+              <li className="text-3xl hover:text-primaryHover"><Link to='/messages'>Messages</Link></li>
             </ul>
           </div>
           <div className="flex space-x-11">
@@ -45,7 +45,7 @@ function Navbar() {
                 <li className="text-3xl hover:text-primaryHover"><Link to='/find-work'>Find Work</Link></li>
                 <li className="text-3xl hover:text-primaryHover"><Link to='/saved-jobs'>Saved Jobs</Link></li>
                 <li className="text-3xl hover:text-primaryHover"><Link to='/freelancer-proposals'>Proposals</Link></li>
-                <li className="text-3xl hover:text-primaryHover"><Link to=''>Messages</Link></li>
+                <li className="text-3xl hover:text-primaryHover"><Link to='/messages'>Messages</Link></li>
               </ul>
             </div>
             <div className="flex space-x-11">

@@ -1,8 +1,7 @@
+
 import React, { useState } from 'react'
 
-function TermsCard() {
-    const[amount,setAmount] = useState(0.0);
-    const[duration,setDuration] = useState("");
+function TermsCard({ amount, setAmount, duration, setDuration }) {
 
     function handleChange(e)
     {

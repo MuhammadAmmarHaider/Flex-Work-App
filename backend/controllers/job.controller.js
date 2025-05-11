@@ -62,10 +62,23 @@ const patchJob = async (req, res) => {
     }
 };
 
+const getJobsByClientId = async (req, res) => {
+    try {
+        const { clientId } = req.params;
+
+        const jobs = await Job.find({ clientId });
+        res.status(200).json(jobs);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 module.exports = {
   getJobs,
   getJobById,
   createJob,
   updateJob,
   patchJob,
+  getJobsByClientId
 };

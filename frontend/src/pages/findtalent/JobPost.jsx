@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react'
 import { CiSearch } from "react-icons/ci";
 import { RxCross1 } from "react-icons/rx";
@@ -69,7 +70,47 @@ function JobPost() {
         e.preventDefault();
         setRoleType(e.target.value.trim());
     }
-      
+    function handlePostJob(e) {
+    e.preventDefault();
+
+    const clientId = localStorage.getItem('clientId'); // Get clientId from localStorage
+
+    if (!clientId) {
+      // Handle case where clientId doesn't exist, maybe redirect to login page
+      console.error("User is not logged in");
+      return;
+    }
+    const jobData = {
+        title,
+        postedTime: new Date().toISOString(),
+        location,
+        type: isFullTime ? "Full-Time" : "Part-Time",
+        roleType,
+        budget: {
+            amount: cost,
+            paymentType: rateType, // Must be 'Hourly' or 'Fixed Price'
+            experienceLevel: experience, // Must be one of the enum values
+        },
+        estimatedDuration: duration, // Must match enum values
+        workload: hoursPerWeek, // Or another label like 'Less than 30 hrs/week'
+        description, // You didn't have this in your code earlier
+        skills,
+        clientId: clientId, // Required; must be passed from frontend or middleware
+    };
+
+
+    axios.post('http://localhost:5000/api/jobs', jobData)  // Update with your actual API URL
+        .then(response => {
+            console.log('Job posted successfully:', response.data);
+            alert("Job posted successfully!");
+            // Optionally reset form or redirect
+        })
+        .catch(error => {
+            console.error('Error posting job:', error);
+            alert("Failed to post job. Please try again.");
+        });
+}
+
   return (
     <div className='mx-20'>
         <h2 className='text-8xl font-semibold my-10'>Post job</h2>
@@ -209,7 +250,7 @@ function JobPost() {
                     <div className="text-3xl my-10">
                     <h3 className="font-semibold mb-6">How long will your work take?</h3>
                     <div className="flex flex-col gap-4">
-                        {["More than 6 months", "3 to 6 months", "1 to 3 months", "Less than a month"].map(option => (
+                        {["More than 6 months", "3 to 6 months", "1 to 3 months", "Less than 1 month"].map(option => (
                         <label key={option} className="flex items-center gap-4">
                             <input
                             type="radio"
@@ -255,7 +296,7 @@ function JobPost() {
                     <h3 className="font-semibold mb-6">What level of experience will it need?</h3>
                     <p className='mb-6 text-[#676767]'>This won't restrict any proposals, but helps match expertise to your budget.</p>
                     <div className="flex flex-col gap-4">
-                        {["Entry", "Intermediate", "Expert"].map(option => (
+                        {["Beginner", "Intermediate", "Senior"].map(option => (
                         <label key={option} className="flex items-center gap-4">
                             <input
                             type="radio"

@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react'
 import { MdAttachFile } from "react-icons/md";
 
 
-function AdditionalDetails() {
+function AdditionalDetails({coverletter,setCoverletter}) {
     const [file,setFile] = useState(null);
-    const [coverletter,setCoverletter] = useState("");
 
     function handleFileChange(e)
     {

@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose")
 
 const proposalSchema = new mongoose.Schema({
@@ -6,7 +7,7 @@ const proposalSchema = new mongoose.Schema({
   coverLetter: String,
   bid: {
     amount: Number,
-    type: { type: String, enum: ['Hourly', 'Fixed'] }
+    type: { type: String, enum: ['Hourly', 'Fixed Price'] }
   },
   submittedAt: { type: Date, default: Date.now },
   status: { type: String, enum: ['pending', 'accepted', 'rejected', 'withdrawn'], default: 'pending' },
@@ -14,4 +15,5 @@ const proposalSchema = new mongoose.Schema({
 });
 
 const Proposal = mongoose.model('Proposal', proposalSchema);
+
 module.exports = Proposal;

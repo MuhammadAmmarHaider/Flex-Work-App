@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import dummyUser from '../../dummyUser';
 import { useDispatch } from 'react-redux';
 import { updateUser, resetUser } from '../../redux/userSlice';
+import axios from 'axios';
 
 const SignupForm = () => {
     const { userType } = useParams();
@@ -16,7 +17,8 @@ const SignupForm = () => {
         password: '',
         country: 'Pakistan',
         subscribe: true,
-        agree: false
+        agree: false,
+        role:userType,
     });
 
     const [loading, setLoading] = useState(false);
@@ -30,38 +32,36 @@ const SignupForm = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
+        
         e.preventDefault();
-
-        if (!formData.agree) {
-            setError('You must agree to the terms.');
-            return;
-        }
-
         setLoading(true);
-        setError(null);
+        setError('');
 
-        setTimeout(() => {
-            const newUser = {
-                ...formData,
-                role: userType,
-            };
-
-            // Reset current user (if any)
-            dispatch(resetUser());
-
-            // Add to dummyUser list (in-memory)
-            dummyUser.push(newUser);
-
-            // Just an option
-            // dispatch(updateUser(newUser));
-            // if (userType === 'client') navigate('/client/dashboard');
-            // else navigate('/'); // Adjust freelancer route if needed
-
+        try {
+        // Using axios instead of fetch
+        const res = await axios.post('http://localhost:5000/signup', formData, {
+            headers: {
+            'Content-Type': 'application/json'
+            }
+        });
+         console.log("Form submitted");
+        // Check for successful signup
+        if (res.status === 201) {
+            alert('Signup successful');
             navigate('/login');
-
-            setLoading(false);
-        }, 1500);
+        }
+        } catch (err) {
+        if (err.response) {
+            // Handle errors from server
+            setError(err.response.data.message || 'Signup failed');
+        } else {
+            // Handle network error or server not responding
+            setError('Network error or server not responding');
+        }
+        } finally {
+        setLoading(false);
+        }
     };
 
     return (
