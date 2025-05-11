@@ -87,16 +87,16 @@ const token = localStorage.getItem('token');
         </div>
         {clientInfo?
           (<div className='flex gap-20 items-center my-12 text-3xl'>
-              <p>{post.client.paymentVerified?<span><HiCheckCircle className='text-[#676767] inline-block'/> Payment verified</span>:<span><RxCrossCircled className='text-[#676767] inline-block'/> Payment unverified</span>} </p>
+              <p>{clientInfo.paymentVerified?<span><HiCheckCircle className='text-[#676767] inline-block'/> Payment verified</span>:<span><RxCrossCircled className='text-[#676767] inline-block'/> Payment unverified</span>} </p>
               <Rating
-                  initialRating={post.client.clientRating}
+                  initialRating={clientInfo.clientRating}
                   readonly
                   emptySymbol={<span className="text-gray-400 text-5xl">☆</span>}
                   fullSymbol={<span className="text-[#df7606] text-5xl">★</span>}
                   />
 
-              <p>${post.client.clientSpent} Spent</p>
-              <div className='flex items-center'><IoLocationOutline className='inline-block'/> {post.client.clientLocation}</div>
+              <p>${clientInfo.clientSpent} Spent</p>
+              <div className='flex items-center'><IoLocationOutline className='inline-block'/> {clientInfo.clientLocation}</div>
           </div>):"client info not got"
         }
     </div>
