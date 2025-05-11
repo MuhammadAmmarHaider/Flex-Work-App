@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-
 import FindWork from "../pages/findwork/FindWork";
 import JobProposal from "../pages/findwork/JobProposal";
 import FindTalent from "../pages/findtalent/FindTalent";
@@ -18,9 +17,10 @@ import ClientProposals from "../pages/proposals/ClientProposals";
 import ClientProfile from "../pages/profile/ClientProfile";
 import FreelancerProfile from "../pages/profile/FreelancerProfile";
 import Profile from "../pages/profile/Profile";
-import SignupForm from '../pages/signupLogin/SignupForm'
+import SignupForm from '../pages/signupLogin/SignupForm';
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import AdminNav from '../pages/Admin/AdminNav';
+import Messages from "../pages/messages/Messages";
 import { Navigate } from 'react-router-dom';
 import AdminRoute from './AdminRoute';
 
@@ -29,7 +29,6 @@ const router = createBrowserRouter([
         path: '/',
         element: <App />,
         children: [
-            //add other routes here
             {
                 path: '/',
                 element: <LandingRouter />
@@ -91,6 +90,10 @@ const router = createBrowserRouter([
                 element: <Profile />
             },
             {
+                path: '/messages',
+                element: <Messages />
+            },
+            {
                 path: '/admin/dashboard',
                 element: <AdminRoute element={<AdminDashboard />} />
             },
@@ -106,9 +109,8 @@ const router = createBrowserRouter([
                 path: '/admin/jobs',
                 element: <AdminRoute element={<AdminDashboard section="jobs" />} />
             }
-
         ]
     }
-])
+]);
 
 export default router;
