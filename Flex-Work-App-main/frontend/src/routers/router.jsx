@@ -18,14 +18,18 @@ import ClientProposals from "../pages/proposals/ClientProposals";
 import ClientProfile from "../pages/profile/ClientProfile";
 import FreelancerProfile from "../pages/profile/FreelancerProfile";
 import Profile from "../pages/profile/Profile";
-
-
+import Whatsnew from "../pages/What's new/whatsnew";
+import Research from "../pages/What's new/research";
 const router = createBrowserRouter([
     {
         path: '/',
         element: <App />,
         children: [
             //add other routes here
+            {
+                path: '/research',
+                element: <Research/>
+            },
             {
                 path: '/',
                 element: <LandingRouter />
@@ -81,6 +85,10 @@ const router = createBrowserRouter([
             {
                 path:'/profile',
                 element:<Profile/>
+            },
+            {
+                path:'/whatsnew',
+                element:<Whatsnew/>
             }
 
         ]

@@ -65,7 +65,7 @@ function Navbar() {
             <li className="text-3xl hover:text-primaryHover"><Link to='/find-talent'>Find talent</Link></li>
             <li className="text-3xl hover:text-primaryHover"><Link to='/find-work'>Find work</Link></li>
             <li className="text-3xl hover:text-primaryHover"><Link to='/why-flexwork'>Why Flexwork</Link></li>
-            <li className="text-3xl hover:text-primaryHover"><Link to=''>What's new</Link></li>
+            <li className="text-3xl hover:text-primaryHover"><Link to='/whatsnew'>What's new</Link></li>
             <li className="text-3xl hover:text-primaryHover"><Link to=''>Pricing</Link></li>
           </ul>
         </div>
