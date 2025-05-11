@@ -1,22 +1,3 @@
-<<<<<<< HEAD:Flex-Work-App-main/backend/routes/user.router.js
-const express = require('express');
-const router = express.Router();
-const {
-  getUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  patchUser,
-} = require('../controllers/user.controller');
-
-router.get('/', getUsers);          
-router.get('/:id', getUserById); 
-router.post('/', createUser);   
-router.put('/:id', updateUser);    
-router.patch('/:id', patchUser); 
-
-module.exports = router;
-=======
 const express = require('express');
 const auth = require("../middleware/auth");
 
@@ -38,4 +19,3 @@ router.patch('/:id',auth, patchUser);
 router.get('/:userId/saved-jobs',auth, getSavedJobs);
 
 module.exports = router;
->>>>>>> cbd0a131a4dcf32a52c69902999e0a4fc7ade991:backend/routes/user.router.js

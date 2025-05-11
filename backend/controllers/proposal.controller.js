@@ -1,82 +1,4 @@
-<<<<<<< HEAD:Flex-Work-App-main/backend/controllers/proposal.controller.js
-const Proposal = require('../models/proposal.model');
 
-
-const getProposals = async (req, res) => {
-    try{
-        const proposals = await Proposal.find(); 
-        res.status(200).json(proposals);
-    } catch (error) {
-        res.status(500).json({message:error.message})
-    }
-};
-
-
-const getProposalById = async (req, res) => {
-    try{
-        const proposal = await Proposal.findById(req.params.id);
-        if (!proposal) {
-            return res.status(404).json({ message: 'Proposal not found' });
-        }
-        res.status(200).json(proposal);
-    } catch (error) {
-        res.status(500).json({message:error.message})
-    }
-};
-
-
-const createProposal = async (req, res) => {
-  try {
-    const newProposal = new Proposal(req.body);
-    const savedProposal = await newProposal.save();
-    res.status(201).json(savedProposal);
-  } catch (error) {
-     res.status(500).json({message:error.message})
-  }
-};
-
-
-const updateProposal = async (req, res) => {
-  try {
-    const proposal = await Proposal.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!proposal) {
-      return res.status(404).json({ message: 'Proposal not found' });
-    }
-    res.status(200).json(proposal);
-  } catch (error) {
-     res.status(500).json({message:error.message})
-  }
-};
-
-
-const patchProposal = async (req, res) => {
-  try {
-    const proposal = await Proposal.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true, runValidators: true }
-    );
-    if (!proposal) {
-      return res.status(404).json({ message: 'Proposal not found' });
-    }
-    res.status(200).json(proposal);
-  } catch (error) {
-     res.status(500).json({message:error.message})
-  }
-};
-
-module.exports = {
-  getProposals,
-  getProposalById,
-  createProposal,
-  updateProposal,
-  patchProposal,
-};
-=======
 const Proposal = require('../models/proposal.model');
 
 
@@ -168,4 +90,3 @@ module.exports = {
   patchProposal,
   getProposalsByClientId
 };
->>>>>>> cbd0a131a4dcf32a52c69902999e0a4fc7ade991:backend/controllers/proposal.controller.js
