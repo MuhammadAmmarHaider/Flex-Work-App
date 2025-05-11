@@ -13,7 +13,7 @@ function Navbar() {
 
   return (
     <nav className="bg-white shadow-md py-8 px-10">
-      {user.role !== null ? (
+      {user.role !== "" ? (
         user.role === 'client' ? (<div className="flex justify-between items-center">
           <div className="flex items-center space-x-11">
             <ul className="flex space-x-9 items-center">

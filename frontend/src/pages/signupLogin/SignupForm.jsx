@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import dummyUser from '../../dummyUser';
 import { useDispatch } from 'react-redux';
 import { updateUser, resetUser } from '../../redux/userSlice';
+import axios from 'axios';
 
 const SignupForm = () => {
     const { userType } = useParams();
@@ -16,7 +17,8 @@ const SignupForm = () => {
         password: '',
         country: 'Pakistan',
         subscribe: true,
-        agree: false
+        agree: false,
+        role:userType,
     });
 
     const [loading, setLoading] = useState(false);
@@ -31,6 +33,7 @@ const SignupForm = () => {
     };
 
     const handleSubmit = async (e) => {
+        
         e.preventDefault();
         setLoading(true);
         setError('');
@@ -42,7 +45,7 @@ const SignupForm = () => {
             'Content-Type': 'application/json'
             }
         });
-
+         console.log("Form submitted");
         // Check for successful signup
         if (res.status === 201) {
             alert('Signup successful');

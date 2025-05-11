@@ -15,7 +15,11 @@ const connectionString = process.env.MONGO_URL
 
 // middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
 
 // routes middlewares
 app.use('/jobs',jobRouters);

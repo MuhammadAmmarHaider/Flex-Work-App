@@ -22,7 +22,22 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
 
  
-    res.json({ token, user: { id: user._id, email: user.email, role: user.role, name: user.name } });
+      res.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        location: user.location,
+        balance: user.balance,
+        rating: user.rating,
+        billingInfo: user.billingInfo,
+        freelancerProfile: user.freelancerProfile,
+        clientProfile: user.clientProfile,
+        createdAt: user.createdAt
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -39,6 +54,7 @@ router.post('/signup', async (req, res) => {
     role
   } = req.body;
 
+  console.log(req.body);
   if (!email || !password || !firstName || !lastName || !role) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
@@ -48,7 +64,7 @@ router.post('/signup', async (req, res) => {
     if (existingUser) return res.status(409).json({ message: 'Email already in use' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    console.log("here reached");
     const user = new User({
       email,
       password: hashedPassword,
@@ -70,6 +86,7 @@ router.post('/signup', async (req, res) => {
       }
     });
   } catch (error) {
+
     console.error('Signup error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
