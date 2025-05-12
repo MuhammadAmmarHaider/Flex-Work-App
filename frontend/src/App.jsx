@@ -5,6 +5,7 @@ import { Outlet } from 'react-router-dom'
 import Footer from './components/Footer'
 import { useSelector } from 'react-redux';
 import AdminNav from './pages/Admin/AdminNav';
+import { LiveChatWidget } from '@livechat/widget-react';
 
 function App() {
   const userRole = useSelector((state) => state.user.role);
@@ -14,6 +15,10 @@ function App() {
       {userRole === 'admin' ? <AdminNav /> : <Navbar />}
       <Outlet />
       <Footer />
+      <LiveChatWidget
+        license="12345678"
+        visibility="minimized"
+      />
     </div>
   )
 }
