@@ -12,6 +12,7 @@ const Login = () => {
     const [error, setError] = useState(null);
     const dispatch = useDispatch();
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const email = emailRef.current.value;
@@ -33,6 +34,8 @@ const Login = () => {
             const { token, user } = response.data;
             localStorage.setItem("token", token);
             localStorage.setItem('userId', user.id);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
 
             dispatch(updateUser(user));
 

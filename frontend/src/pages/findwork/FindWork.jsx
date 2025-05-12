@@ -14,15 +14,15 @@ function FindWork() {
     const inputRef = useRef();
 
     useEffect(() => {
-        inputRef.current.focus();
+        if (inputRef.current) inputRef.current.focus();
 
         const fetchJobs = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/jobs');
+                const response = await axios.get('http://localhost:5000/jobs')
                 setJobs(response.data);
                 setLoading(false);
             } catch (err) {
-                setError('Failed to load jobs.');
+                setError('Failed to load jobs.: ' + err.message);
                 setLoading(false);
             }
         };
