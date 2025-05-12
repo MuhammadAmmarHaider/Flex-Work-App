@@ -72,9 +72,10 @@ const patchProposal = async (req, res) => {
 const getProposalsByClientId = async (req, res) => {
   try {
     const { clientId } = req.params;
+    console.log(clientId);
     const jobs = await Job.find({ clientId }, '_id');
     const jobIds = jobs.map(job => job._id);
-    const proposals = await Proposal.find({ jobId: { $in: jobIds } });
+    const proposals = await Proposal.find({ jobId: { $in: jobIds } }).populate('jobId', 'title');
 
     res.status(200).json(proposals);
   } catch (error) {
