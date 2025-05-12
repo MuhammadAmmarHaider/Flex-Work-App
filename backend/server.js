@@ -16,25 +16,25 @@ const connectionString = process.env.MONGO_URL
 // middlewares
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
+    origin: 'http://localhost:5173',
+    credentials: true
 }));
 
 
 // routes middlewares
-app.use('/jobs',jobRouters);
-app.use("/proposals",proposalRoutes);
-app.use("/users",userRoutes);
+app.use('/jobs', jobRouters);
+app.use("/proposals", proposalRoutes);
+app.use("/users", userRoutes);
 app.use(authRoutes);
 
 mongoose.connect(connectionString)
-.then(()=>{
-    console.log("database connected successfully");
-    app.listen(port,()=>{
-        console.log("server is running at port ",port)
+    .then(() => {
+        console.log("database connected successfully");
+        app.listen(port, () => {
+            console.log("server is running at port ", port)
+        })
     })
-})
-.catch((e)=>{
-    console.log("database not connected");
-    console.log(e.message);
-})
+    .catch((e) => {
+        console.log("database not connected");
+        console.log(e.message);
+    })

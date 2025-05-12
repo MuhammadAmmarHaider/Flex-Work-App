@@ -11,11 +11,11 @@ const {
   getSavedJobs
 } = require('../controllers/user.controller');
 
-router.get('/',auth, getUsers);          
-router.get('/:id',auth, getUserById); 
-router.post('/',auth, createUser);   
-router.put('/:id',auth, updateUser);    
-router.patch('/:id',auth, patchUser); 
-router.get('/:userId/saved-jobs',auth, getSavedJobs);
+router.get('/', auth, getUsers);
+router.get('/:id', auth, getUserById);
+router.post('/', auth, createUser);
+router.put('/:id', auth, updateUser);
+router.patch('/:id', auth, patchUser);
+router.get('/:userId/saved-jobs', auth, getSavedJobs);
 
 module.exports = router;
