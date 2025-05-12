@@ -4,14 +4,20 @@ import { CiCreditCard1 } from "react-icons/ci";
 import { PiAddressBookLight } from "react-icons/pi";
 import { BiHide, BiShow } from "react-icons/bi";
 import { updateUserField } from "../../redux/userSlice"
+import axios from 'axios';
 
 function ClientProfile() {
     const [isEditing, setIsEditing] = useState(false);
     const [tempData, setTempData] = useState({});
-    const [showBillingInfo, setShowBillingInfo] = useState(true);
-    const [showCard, setShowCard] = useState(false);
+    const [showBillingInfo, setShowBillingInfo] = useState(true); const [showCard, setShowCard] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [isSaving, setIsSaving] = useState(false);
     const user = useSelector((state) => state.user);
     const dispatch = useDispatch();
+
+    const toggleCardVisibility = () => {
+        setShowCard(prev => !prev);
+    };
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -22,6 +28,8 @@ function ClientProfile() {
             industry: user.clientProfile.industry,
             description: user.clientProfile.description
         });
+
+        setShowBillingInfo(false);
     };
 
     const handleCancel = () => {
@@ -29,7 +37,7 @@ function ClientProfile() {
         setTempData({});
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const newErrors = {};
         Object.keys(tempData).forEach((key) => {
             if (!tempData[key]) {
@@ -37,49 +45,117 @@ function ClientProfile() {
             }
         });
 
+        setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) {
             return;
         }
 
-        dispatch(updateUserField({ path: 'name', value: tempData.name }));
-        dispatch(updateUserField({ path: 'email', value: tempData.email }));
-        dispatch(updateUserField({ path: 'clientProfile.companyName', value: tempData.companyName }));
-        dispatch(updateUserField({ path: 'clientProfile.industry', value: tempData.industry }));
-        dispatch(updateUserField({ path: 'clientProfile.description', value: tempData.description }));
+        setIsSaving(true);
+        try {
+            // Check if we have the user ID
+            console.log(user);
+            if (!user._id) {
+                alert('Session expired. Please log in again.');
+                return;
+            }
 
-        setIsEditing(false);
-    };
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert('Session expired. Please log in again.');
+                return;
+            }
 
-    const handleChange = (e) => {
+            const updatedFields = {
+                name: tempData.name,
+                email: tempData.email,
+                clientProfile: {
+                    companyName: tempData.companyName,
+                    industry: tempData.industry,
+                    description: tempData.description
+                }
+            };
+
+            console.log('Sending update for user:', user._id);
+            console.log('Update payload:', updatedFields);
+
+            const response = await axios.patch(
+                `http://localhost:5000/users/${user._id}`,
+                updatedFields,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            if (response.data) {
+                // Update Redux store with the response data
+                dispatch(updateUserField({ path: 'name', value: tempData.name }));
+                dispatch(updateUserField({ path: 'email', value: tempData.email }));
+                dispatch(updateUserField({ path: 'clientProfile.companyName', value: tempData.companyName }));
+                dispatch(updateUserField({ path: 'clientProfile.industry', value: tempData.industry }));
+                dispatch(updateUserField({ path: 'clientProfile.description', value: tempData.description }));
+
+                setIsEditing(false);
+                setErrors({});
+                alert('Profile updated successfully!');
+            }
+        } catch (error) {
+            console.error("Failed to update user in backend:", error);
+            if (error.response) {
+                console.error("Server response:", error.response.data);
+            }
+            alert(error.message || "Something went wrong while saving. Please try again.");
+        } finally {
+            setIsSaving(false);
+        }
+    }; const handleChange = (e) => {
         const { name, value } = e.target;
-        setTempData({ ...tempData, [name]: value });
+        setTempData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
-    const toggleCardVisibility = () => {
-        setShowCard((prev) => !prev);
+    const handleDeleteBillingInfo = async () => {
+        try {
+            const userId = user._id;
+            const token = localStorage.getItem("token");
+
+            await axios.patch(
+                `http://localhost:5000/users/${userId}`,
+                {
+                    billingInfo: {
+                        cardNumber: "",
+                        expiryDate: "",
+                        cvc: "",
+                        billingAddress: "",
+                        holderName: ""
+                    }
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            // Update Redux store
+            dispatch(updateUserField({ path: 'billingInfo.cardNumber', value: "" }));
+            dispatch(updateUserField({ path: 'billingInfo.expiryDate', value: "" }));
+            dispatch(updateUserField({ path: 'billingInfo.cvc', value: "" }));
+            dispatch(updateUserField({ path: 'billingInfo.billingAddress', value: "" }));
+            dispatch(updateUserField({ path: 'billingInfo.holderName', value: "" }));
+
+        } catch (error) {
+            console.error("Failed to delete billing info in backend:", error);
+            alert("Could not update billing info on the server.");
+        }
     };
 
-    const handleDeleteBillingInfo = (e) => {
-        e.preventDefault();
-        dispatch(updateUserField({
-            path: 'billingInfo.cardNumber',
-            value: ""
-        }));
-        dispatch(updateUserField({
-            path: 'billingInfo.expiryDate',
-            value: ""
-        }));
-        dispatch(updateUserField({
-            path: 'billingInfo.cvc',
-            value: ""
-        }));
-        dispatch(updateUserField({
-            path: 'billingInfo.billingAddress',
-            value: ""
-        }));
-    };
-    console.log(user);
-    function isFormComplete() {
+    const isFormComplete = () => {
         const isCardNumberValid = user.billingInfo.cardNumber.length === 16;
         const isNameValid = user.billingInfo.holderName.trim() !== '';
         const isBillingAddressValid = user.billingInfo.billingAddress.trim() !== '';
@@ -88,18 +164,39 @@ function ClientProfile() {
         return isCardNumberValid && isNameValid && isExpiryValid && isCvcValid && isBillingAddressValid;
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (isFormComplete()) {
-            setShowBillingInfo(true);
-        }
-        else {
+            try {
+                const userId = user._id;
+                const token = localStorage.getItem("token");
+
+                // Update backend with all billing info at once
+                await axios.patch(
+                    `http://localhost:5000/users/${userId}`,
+                    {
+                        billingInfo: {
+                            ...user.billingInfo
+                        }
+                    },
+                    token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+                );
+
+                setShowBillingInfo(true);
+            } catch (error) {
+                console.error("Failed to update billing info:", error);
+                alert("Failed to save billing information. Please try again.");
+                setShowBillingInfo(false);
+            }
+        } else {
             alert("Please complete all fields correctly.");
             setShowBillingInfo(false);
         }
     };
 
-    const maskedCard = user.billingInfo.cardNumber.replace(/\d(?=\d{4})/g, '*');
+    const maskedCard = user?.billingInfo?.cardNumber
+        ? user.billingInfo.cardNumber.replace(/\d(?=\d{4})/g, '*')
+        : '';
     return (
         <div className="text-3xl min-h-screen flex flex-col items-center bg-gray-100 p-6">
             <h2 className="text-5xl font-bold text-gray-700 mb-4">My Info</h2>
@@ -122,13 +219,14 @@ function ClientProfile() {
                         </div>
                         <div>
                             <input
-                                className={`font-semibold my-6 w-full bg-transparent ${isEditing ? 'border border-black p-2 rounded-xl' : 'border-none'}`}
+                                className={`font-semibold my-6 w-full bg-transparent ${isEditing ? 'border border-black p-2 rounded-xl' : 'border-none'} ${errors.name ? 'border-red-500' : ''}`}
                                 type="text"
-                                name="holderName"
+                                name="name"
                                 value={isEditing ? tempData.name : user.name}
                                 onChange={handleChange}
                                 disabled={!isEditing}
                             />
+                            {errors.name && <div className="text-red-500 text-lg">{errors.name}</div>}
                             <input
                                 className={`text-[#676767] my-6 w-full bg-transparent ${isEditing ? 'border border-black p-2 rounded-xl' : 'border-none'}`}
                                 type="text"
@@ -138,22 +236,24 @@ function ClientProfile() {
                                 readOnly
                             />
                             <input
-                                className={`font-semibold my-6 w-full bg-transparent ${isEditing ? 'border border-black p-2 rounded-xl' : 'border-none'}`}
+                                className={`font-semibold my-6 w-full bg-transparent ${isEditing ? 'border border-black p-2 rounded-xl' : 'border-none'} ${errors.companyName ? 'border-red-500' : ''}`}
                                 type="text"
                                 name="companyName"
                                 value={isEditing ? tempData.companyName : user.clientProfile.companyName}
                                 onChange={handleChange}
                                 disabled={!isEditing}
                             />
+                            {errors.companyName && <div className="text-red-500 text-lg">{errors.companyName}</div>}
                             <label className='text-[#676767] my-6 block'>Email</label>
                             <input
-                                className={`font-semibold my-6 w-full bg-transparent ${isEditing ? 'border border-black p-2 rounded-xl' : 'border-none'}`}
+                                className={`font-semibold my-6 w-full bg-transparent ${isEditing ? 'border border-black p-2 rounded-xl' : 'border-none'} ${errors.email ? 'border-red-500' : ''}`}
                                 type="text"
                                 name="email"
                                 value={isEditing ? tempData.email : user.email}
                                 onChange={handleChange}
                                 disabled={!isEditing}
                             />
+                            {errors.email && <div className="text-red-500 text-lg">{errors.email}</div>}
                         </div>
                     </div>
                 </div>
@@ -172,7 +272,7 @@ function ClientProfile() {
                                 value={isEditing ? tempData.industry : user.clientProfile.industry || ""}
                                 onChange={isEditing ? handleChange : undefined}
                                 disabled={!isEditing}
-                                className={`my-6 w-full ${isEditing ? 'border-2 border-black border-solid p-4 rounded-xl appearance-auto' : 'bg-transparent border-none appearance-none'} [&::-ms-expand]:hidden`}
+                                className={`my-6 w-full ${isEditing ? 'border-2 border-black border-solid p-4 rounded-xl appearance-auto' : 'bg-transparent border-none appearance-none'} ${errors.industry ? 'border-red-500' : ''} [&::-ms-expand]:hidden`}
                                 style={!isEditing ? { backgroundImage: 'none' } : {}}
                             >
                                 <option value="" disabled hidden>Industry:</option>
@@ -205,6 +305,7 @@ function ClientProfile() {
                                 <option value="Transportation & Warehousing">Transportation & Warehousing</option>
                                 <option value="Travel & Hospitality">Travel & Hospitality</option>
                             </select>
+                            {errors.industry && <div className="text-red-500 text-lg">{errors.industry}</div>}
                             <br />
                             <label htmlFor="description" >Description:</label>
                             <textarea
@@ -213,8 +314,9 @@ function ClientProfile() {
                                 value={isEditing ? tempData.description : user.clientProfile.description}
                                 onChange={isEditing ? handleChange : undefined}
                                 disabled={!isEditing}
-                                className={`rounded-3xl w-full h-80 my-6 p-3 ${isEditing ? 'border-2 border-black border-solid' : 'bg-transparent border-none'}`}
+                                className={`rounded-3xl w-full h-80 my-6 p-3 ${isEditing ? 'border-2 border-black border-solid' : 'bg-transparent border-none'} ${errors.description ? 'border-red-500' : ''}`}
                             />
+                            {errors.description && <div className="text-red-500 text-lg">{errors.description}</div>}
                         </div>
                     </div>
                 </div>
@@ -365,14 +467,16 @@ function ClientProfile() {
                     <button
                         onClick={handleCancel}
                         className="bg-gray-500 text-white p-3 rounded-xl hover:bg-gray-600"
+                        disabled={isSaving}
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSave}
-                        className="bg-blue-500 text-white p-3 rounded-xl hover:bg-blue-600"
+                        className="bg-blue-500 text-white p-3 rounded-xl hover:bg-blue-600 disabled:opacity-50"
+                        disabled={isSaving}
                     >
-                        Save
+                        {isSaving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             )}

@@ -32,8 +32,8 @@ const Login = () => {
 
             const { token, user } = response.data;
             localStorage.setItem("token", token);
-            localStorage.setItem('userId', user.id);
-
+            localStorage.setItem('userId', user._id);
+            console.log("in login page: " + user._id + "-" + user.id)
             dispatch(updateUser(user));
 
             if (user.role === "admin") {
