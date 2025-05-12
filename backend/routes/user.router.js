@@ -8,7 +8,8 @@ const {
   createUser,
   updateUser,
   patchUser,
-  getSavedJobs
+  getSavedJobs,
+  saveJob
 } = require('../controllers/user.controller');
 
 router.get('/', auth, getUsers);
@@ -17,5 +18,7 @@ router.post('/', auth, createUser);
 router.put('/:id', auth, updateUser);
 router.patch('/:id', auth, patchUser);
 router.get('/:userId/saved-jobs', auth, getSavedJobs);
+router.post('/save-job', auth, saveJob);
+
 
 module.exports = router;

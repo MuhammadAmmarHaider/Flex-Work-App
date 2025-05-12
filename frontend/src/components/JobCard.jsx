@@ -6,7 +6,7 @@ import { IoLocationOutline } from "react-icons/io5";
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
 import { IoMdHeartEmpty } from "react-icons/io";
-
+import axios from 'axios';
 
 function JobCard({post}) 
 {
@@ -46,20 +46,52 @@ function JobCard({post})
 
     const handleClickOnPost =(e)=>{
         e.preventDefault();
-        navigate(`/apply-job/${post.id}`);
+        navigate(`/apply-job/${post._id}`);
     }
 
     const handleApplyJob=(e)=>{
         e.preventDefault();
-        navigate('');
+        navigate(`/apply-job/${post._id}`);
     }
-    const handleSaveJob=(e)=>{
-        e.preventDefault()
-        navigate(`/apply-job/${post.id}`);
+const handleSaveJob = async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const userId = localStorage.getItem('userId');  // Retrieve userId from localStorage
+
+  const jobId = post._id;  // Ensure jobId is passed correctly
+
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/users/save-job',
+      { jobId, userId },  // Include userId in the request body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      console.log('Job saved successfully:', response.data);
+      alert('Job saved successfully!');
+      navigate('/');
     }
+  } catch (error) {
+    console.error('Error saving job:', error);
+
+    if (error.response) {
+      alert(`Failed to save job: ${error.response.data.message || error.response.data.error}`);
+    } else {
+      alert('Failed to save job. Please try again.');
+    }
+  }
+};
+
+
       
     const isLong = post.description.split(' ').length > 40;
 
+    console.log(post);
   return (
     <div className='bg-[#f1f1f1] hover:bg-[#e0e0e0] p-6 text-4xl my-8' onClick={handleClickOnPost}>
         <p className='text-2xl'>Posted {post.postedTime}</p>

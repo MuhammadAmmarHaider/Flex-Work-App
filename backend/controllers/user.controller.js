@@ -74,6 +74,36 @@ const getSavedJobs = async (req, res) => {
   }
 }
 
+const saveJob = async (req, res) => {
+  console.log("inside the save job");
+  const userId = req.body.userId; 
+  const { jobId } = req.body;
+  console.log(userId);
+  if (!jobId) {
+    return res.status(400).json({ error: 'Job ID is required.' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    // Prevent duplicate job saves
+    if (user.savedJobs.includes(jobId)) {
+      return res.status(400).json({ message: 'Job already saved.' });
+    }
+
+    user.savedJobs.push(jobId);
+    await user.save();
+
+    res.status(200).json({ message: 'Job saved successfully.', savedJobs: user.savedJobs });
+  } catch (err) {
+    console.error('Error saving job:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+
 module.exports = {
   getUsers,
   getUserById,
@@ -81,4 +111,5 @@ module.exports = {
   updateUser,
   patchUser,
   getSavedJobs,
+  saveJob,
 };

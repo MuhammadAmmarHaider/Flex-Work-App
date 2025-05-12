@@ -1,9 +1,10 @@
 
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import JobDetails from './JobDetails';
 import TermsCard from './TermsCard';
 import AdditionalDetails from './AdditionalDetails';
+import axios from 'axios';
 
 function JobProposal() {
   const {id} = useParams();
@@ -11,24 +12,39 @@ function JobProposal() {
   const [amount, setAmount] = useState(0.0);
   const [duration, setDuration] = useState('');
   const [coverletter,setCoverletter] = useState("");
+  const[job,setJob] = useState({});
 
      const applicantId = localStorage.getItem('userId');
   
-    useEffect(() => {
-    async function fetchJob() {
-      try {
-        const response = await axios.get('/jobs');
-        const allJobs = response.data;
-        const foundJob = allJobs.find((j) => j._id === id || j.id === id);
-        setJob(foundJob);
-      } catch (err) {
-        console.error('Error fetching job:', err);
+useEffect(() => {
+  async function fetchJob() {
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await axios.get(`http://localhost:5000/jobs/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const foundJob = response.data;
+      // const foundJob = allJobs.find((j) => j._id === id || j.id === id);
+
+      if (!foundJob) {
+        alert("Job not found.");
+        return;
       }
+      setJob(foundJob);
+    } catch (err) {
+      console.error('Error fetching job:', err);
     }
+  }
 
-    fetchJob();
-  }, [id]);
+  fetchJob();
+}, [id]);
 
+
+const token = localStorage.getItem('token');
   async function handleSubmitProposal(e) {
     e.preventDefault();
 
@@ -36,20 +52,29 @@ function JobProposal() {
       alert('Please fill in all fields.');
       return;
     }
-
     try {
-      const proposalData = {
-        jobId: job._id || job.id,
-        applicantId: applicantId,
-        coverLetter: coverletter,
-        bid: {
-          amount: parseFloat(amount),
-          type: job.budget.paymentType
-        },
-        duration: duration
-      };
+const proposalData = {
+  jobId: id, // Make sure this is NOT undefined
+  applicantId: applicantId,
+  coverLetter: coverletter,
+  bid: {
+    amount: parseFloat(amount),
+    type: job.budget?.paymentType || 'Fixed Price'
+  },
+  duration: duration,
+};
 
-      const response = await axios.post('/api/proposals', proposalData);
+
+
+      const response = await axios.post(
+  'http://localhost:5000/proposals',
+  proposalData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
       if (response.status === 201) {
         alert('Proposal submitted successfully!');
@@ -63,7 +88,7 @@ function JobProposal() {
 
   function handleClickCancel(e) {
     e.preventDefault();
-    navigate('');
+    navigate('/');
   }
 
   return (

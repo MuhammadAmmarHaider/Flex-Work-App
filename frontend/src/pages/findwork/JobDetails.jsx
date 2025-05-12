@@ -18,7 +18,7 @@ function JobDetails({job}) {
                 <p className='my-4'>You will need:</p>
                 <ul className='list-decimal ml-8'>
                     {
-                        job.scopeOfWork.map((work,index)=>{
+                        job.scopeOfWork?.map((work,index)=>{
                             return <li key={index}>{work}</li>
                         })
                     }
@@ -30,7 +30,7 @@ function JobDetails({job}) {
                 <h3 className='text-4xl font-semibold'>Skills and expertise</h3>
                     <ul className="flex gap-4 items-center flex-nowrap my-12">
                         {
-                            job.skills.map((skill) => (
+                            job.skills?.map((skill) => (
                                 <li key={skill} className="bg-[#d9d9d9] px-6 py-3 rounded-full whitespace-nowrap">{skill}</li>
                         ))}
                     </ul>

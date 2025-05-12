@@ -12,23 +12,35 @@ function FindWork() {
     const [error, setError] = useState(null);
 
     const inputRef = useRef();
-
-    useEffect(() => {
+        const clientId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token'); 
+useEffect(() => {
+    if (inputRef.current) {
         inputRef.current.focus();
+    }
 
-        const fetchJobs = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/jobs');
-                setJobs(response.data);
-                setLoading(false);
-            } catch (err) {
-                setError('Failed to load jobs.');
-                setLoading(false);
-            }
-        };
+    const fetchJobs = async () => {
+        const token = localStorage.getItem('token');  // <-- get token
 
-        fetchJobs();
-    }, []);
+        try {
+            const response = await axios.get('http://localhost:5000/jobs', {
+                headers: {
+                    Authorization: `Bearer ${token}`  // <-- add token here
+                }
+            });
+
+            setJobs(response.data);
+            setLoading(false);
+        } catch (err) {
+            console.error('Error fetching jobs:', err);
+            setError('Failed to load jobs.');
+            setLoading(false);
+        }
+    };
+
+    fetchJobs();
+}, [inputRef]);
+
 
     function handleChange(e) {
         e.preventDefault();

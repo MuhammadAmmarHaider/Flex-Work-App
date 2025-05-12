@@ -10,19 +10,26 @@ function SavedJobs() {
 
   const userId = localStorage.getItem('userId');
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/users/${userId}/saved-jobs`)
-      .then((res) => {
-        setSavedJobs(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError('Failed to fetch saved jobs');
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+useEffect(() => {
+  const token = localStorage.getItem('token'); // Get token from localStorage
+
+  axios
+    .get(`http://localhost:5000/users/${userId}/saved-jobs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((res) => {
+      setSavedJobs(res.data);
+      setLoading(false);
+    })
+    .catch((err) => {
+      setError('Failed to fetch saved jobs');
+      console.error(err);
+      setLoading(false);
+    });
+}, []);
+
 
   if (loading) return <div className="text-center mt-20 text-xl">Loading...</div>;
   if (error) return <div className="text-center mt-20 text-red-500">{error}</div>;
