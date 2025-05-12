@@ -2,12 +2,14 @@
 import React, { useState } from 'react'
 import { CiSearch } from "react-icons/ci";
 import { RxCross1 } from "react-icons/rx";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 
 function JobPost() {
     
-    const [skills,setSkills] = useState([]);
     const [scope,setScope] = useState("");
+    const [skills,setSkills] = useState([]);
     const [duration, setDuration] = useState("");
     const [experience,setExperience] = useState("");
     const [isFullTime,setIsFullTime] = useState(false);
@@ -16,8 +18,10 @@ function JobPost() {
     const [title,setTitle] = useState("");
     const [roleType,setRoleType]  = useState("");
     const [hoursPerWeek,setHoursPerWeek] = useState("");
-    const [locatoin,setLocation] = useState("");
+    const [location,setLocation] = useState("");
+    const [description,setDescription] = useState("");
 
+    const navigate = useNavigate();
     const exampleTitles = [
         'Build responsive WordPress site with booking/payment functionality',
         'Graphic designer needed to design ad creative for multiple campaigns',
@@ -53,13 +57,10 @@ function JobPost() {
     function handleDeleteSkill(skillToDelete) {
         setSkills(prev => prev.filter(skill => skill !== skillToDelete));
       }
-    function handlePostJob(e)
-    {
-        e.preventDefault()
-    }
     function handleCancel(e)
     {
         e.preventDefault();
+        navigate("/");
     }
     function handleTitleChange(e){
         e.preventDefault();
@@ -70,46 +71,53 @@ function JobPost() {
         e.preventDefault();
         setRoleType(e.target.value.trim());
     }
-    function handlePostJob(e) {
-    e.preventDefault();
 
-    const clientId = localStorage.getItem('clientId'); // Get clientId from localStorage
+function handlePostJob(e) {
+  e.preventDefault();
 
-    if (!clientId) {
-      // Handle case where clientId doesn't exist, maybe redirect to login page
-      console.error("User is not logged in");
-      return;
+  const clientId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token'); 
+
+  if (!clientId) {
+    console.error("User is not logged in");
+    return;
+  }
+
+  const jobData = {
+    title,
+    postedTime: new Date().toISOString(),
+    location,
+    type: isFullTime ? "Full-Time" : "Part-Time",
+    roleType,
+    budget: {
+      amount: cost,
+      paymentType: rateType,
+      experienceLevel: experience,
+    },
+    estimatedDuration: duration,
+    workload: hoursPerWeek,
+    description,
+    skills,
+    clientId: clientId,
+  };
+
+  axios.post('http://localhost:5000/jobs', jobData, {
+    headers: {
+      Authorization: `Bearer ${token}`
     }
-    const jobData = {
-        title,
-        postedTime: new Date().toISOString(),
-        location,
-        type: isFullTime ? "Full-Time" : "Part-Time",
-        roleType,
-        budget: {
-            amount: cost,
-            paymentType: rateType, // Must be 'Hourly' or 'Fixed Price'
-            experienceLevel: experience, // Must be one of the enum values
-        },
-        estimatedDuration: duration, // Must match enum values
-        workload: hoursPerWeek, // Or another label like 'Less than 30 hrs/week'
-        description, // You didn't have this in your code earlier
-        skills,
-        clientId: clientId, // Required; must be passed from frontend or middleware
-    };
-
-
-    axios.post('http://localhost:5000/api/jobs', jobData)  // Update with your actual API URL
-        .then(response => {
-            console.log('Job posted successfully:', response.data);
-            alert("Job posted successfully!");
-            // Optionally reset form or redirect
-        })
-        .catch(error => {
-            console.error('Error posting job:', error);
-            alert("Failed to post job. Please try again.");
-        });
+  })
+  .then(response => {
+    console.log('Job posted successfully:', response.data);
+    alert("Job posted successfully!");
+    // Optionally reset form or redirect
+    navigate('/');
+  })
+  .catch(error => {
+    console.error('Error posting job:', error);
+    alert("Failed to post job. Please try again.");
+  });
 }
+
 
   return (
     <div className='mx-20'>
@@ -276,7 +284,7 @@ function JobPost() {
                         <label key={option} className="flex items-center gap-4">
                             <input
                             type="radio"
-                            name="duration"
+                            name="hoursperweek"
                             required  
                             value={option}
                             checked={hoursPerWeek === option}
@@ -356,7 +364,7 @@ function JobPost() {
                         <label key={option} className="flex items-center gap-4">
                             <input
                             type="radio"
-                            name="duration"
+                            name="loc"
                             required  
                             value={option}
                             checked={location === option}
@@ -441,7 +449,7 @@ function JobPost() {
                 </div>
                 <div className='w-5/12 text-3xl'>
                     <p className='mb-6'>Describe what you need</p>
-                    <textarea placeholder='Already have a description? Paste it here!' name="description" id="description" required className='p-4 h-96 w-full border-2 border-black border-solid hover:border-4'></textarea>  
+                    <textarea onChange={(e)=>{e.preventDefault();setDescription(e.target.value)}} placeholder='Already have a description? Paste it here!' name="description" id="description" required className='p-4 h-96 w-full border-2 border-black border-solid hover:border-4'></textarea>  
                 </div>
             </div>
 

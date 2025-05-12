@@ -8,16 +8,22 @@ function ClientProposals() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const clientId = localStorage.getItem('clientId');
+    const clientId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token'); 
 
     useEffect(() => {
         const fetchProposals = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/proposals/client/${clientId}`);
+                const response = await axios.get(`http://localhost:5000/proposals/client/${clientId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
                 setProposals(response.data);
                 setLoading(false);
             } catch (err) {
-                setError('Failed to load proposals.');
+                setError(err.response?.data?.message || 'Failed to load proposals.');
                 setLoading(false);
             }
         };
@@ -29,7 +35,7 @@ function ClientProposals() {
             setLoading(false);
         }
     }, [clientId]);
-
+    console.log(proposals);
     return (
         <div className='m-20'>
             <h3 className='text-7xl font-semibold my-20 bg-primary text-white py-24 px-8 rounded-3xl'>My proposals</h3>
@@ -37,7 +43,7 @@ function ClientProposals() {
                     {error && <p className='text-red-500'>{error}</p>}
             <ul>
                 {
-                    proposals.map((proposal) => (
+                    proposals.length>0?( proposals.map((proposal) => (
                         <li
                             key={proposal._id}
                             className='border-2 border-black border-solid text-3xl p-16 my-8 rounded-2xl flex items-start justify-between hover:bg-[#E8F5E9]'
@@ -54,7 +60,7 @@ function ClientProposals() {
                                 <p className='text-[#676767]'><b>Status:</b> {proposal.status}</p>
                             </div>
                         </li>
-                    ))
+                    ))):"uptill now no proposal for you"
                 }
             </ul>
         </div>

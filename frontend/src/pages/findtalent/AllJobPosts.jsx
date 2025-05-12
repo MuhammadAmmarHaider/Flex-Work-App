@@ -10,15 +10,20 @@ function AllJobPosts() {
 
   useEffect(() => {
     const clientId = localStorage.getItem('userId');
-
+    const token = localStorage.getItem('token'); 
     if (!clientId) {
       setError('User not logged in.');
       setLoading(false);
       return;
     }
+    console.log(clientId);
 
-    axios.get(`http://localhost:5000/jobs/client/${clientId}`)
-      .then(response => {
+    axios.get(`http://localhost:5000/jobs/client/${clientId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(response => {
         setSavedJobs(response.data);
         setLoading(false);
       })
@@ -39,9 +44,9 @@ function AllJobPosts() {
       {error && <p className='text-red-500'>{error}</p>}
 
       <div className='my-12'>
-        {savedJobs.map(post => (
+        {savedJobs.length>0 ?savedJobs.map(post => (
           <PostedJob key={post._id} post={post} />
-        ))}
+        )):"you have no job posted uptill now"}
       </div>
     </div>
   );
